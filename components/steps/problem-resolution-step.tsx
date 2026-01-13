@@ -25,6 +25,11 @@ import {
   Users,
   TrendingDown,
   Gift,
+  UserPlus,
+  Smartphone,
+  Home,
+  ShieldCheck,
+  Sparkles,
 } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
@@ -40,6 +45,7 @@ interface ProblemResolutionStepProps {
 }
 
 const PROBLEM_CATEGORIES = [
+  { id: "join", label: "New Customer / Join", icon: UserPlus, description: "Customer wants to join Rogers/Fido" },
   { id: "billing", label: "Billing Inquiry", icon: CreditCard, description: "Bill questions, charges, credits" },
   { id: "account", label: "Account Changes", icon: Settings, description: "Update info, add/remove services" },
   { id: "technical", label: "Technical Support", icon: Wrench, description: "Service issues, troubleshooting" },
@@ -122,6 +128,540 @@ export function ProblemResolutionStep({
           </div>
         </CardContent>
       </Card>
+
+      {selectedCategory === "join" && (
+        <Card className="border-green-200">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2 text-green-800">
+              <UserPlus className="h-4 w-4" />
+              New Customer - Welcome to {brandName}!
+            </CardTitle>
+            <div className="flex gap-2 mt-2">
+              <Badge className="bg-green-100 text-green-800">New Acquisition</Badge>
+              <Badge variant="outline">Probing Questions Required</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Alert className="border-green-200 bg-green-50">
+              <Sparkles className="h-4 w-4 text-green-600" />
+              <AlertTitle className="text-green-800">New Customer Opportunity</AlertTitle>
+              <AlertDescription className="text-green-700">
+                This customer is interested in joining {brandName}! Use probing questions to understand their needs and
+                find the best package for them.
+              </AlertDescription>
+            </Alert>
+
+            <ScriptCard variant="success">
+              <p>
+                &ldquo;Welcome to {brandName}, {customerName}! I&apos;m excited to help you find the perfect plan today.
+                May I ask a few questions to understand your needs better and ensure I recommend the best options for
+                you?&rdquo;
+              </p>
+            </ScriptCard>
+
+            <Tabs defaultValue="probing" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="probing">Probing Questions</TabsTrigger>
+                <TabsTrigger value="scenarios">Common Scenarios</TabsTrigger>
+                <TabsTrigger value="byod">BYOD Process</TabsTrigger>
+                <TabsTrigger value="selfserve">Self-Serve Setup</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="probing" className="space-y-3">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <HelpCircle className="h-4 w-4" />
+                      Essential Probing Questions
+                    </CardTitle>
+                    <CardDescription>Ask these to find the best package</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="interest">
+                        <AccordionTrigger>1. What package interests them?</AccordionTrigger>
+                        <AccordionContent className="space-y-3">
+                          <ScriptCard variant="primary">
+                            <p>
+                              &ldquo;What packages have you been looking at on{" "}
+                              {brand === "fido" ? "fido.ca" : "rogers.com"}? Is there a specific plan or offer that
+                              caught your attention?&rdquo;
+                            </p>
+                          </ScriptCard>
+                          <div className="p-3 bg-muted rounded-lg text-sm">
+                            <p className="font-medium mb-2">Why ask this:</p>
+                            <ul className="text-muted-foreground space-y-1">
+                              <li>• Understand what they&apos;ve already researched</li>
+                              <li>• Know their price expectations</li>
+                              <li>• Identify if they have misconceptions about offers</li>
+                            </ul>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+
+                      <AccordionItem value="household">
+                        <AccordionTrigger>2. Who is this for?</AccordionTrigger>
+                        <AccordionContent className="space-y-3">
+                          <ScriptCard variant="primary">
+                            <p>
+                              &ldquo;Is this plan just for yourself, or are you looking to set up service for other
+                              family members as well? How many lines would you need in total?&rdquo;
+                            </p>
+                          </ScriptCard>
+                          <div className="p-3 bg-muted rounded-lg text-sm">
+                            <p className="font-medium mb-2">Family scenarios to explore:</p>
+                            <ul className="text-muted-foreground space-y-1">
+                              <li>
+                                • <strong>Single user:</strong> Focus on individual plan value
+                              </li>
+                              <li>
+                                • <strong>Couple:</strong> Shared data options, multi-line discount
+                              </li>
+                              <li>
+                                • <strong>Family with kids:</strong> Parental controls, data management
+                              </li>
+                              <li>
+                                • <strong>Family with teens/adults:</strong> Individual data needs per line
+                              </li>
+                            </ul>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+
+                      <AccordionItem value="usage">
+                        <AccordionTrigger>3. What&apos;s their usage pattern?</AccordionTrigger>
+                        <AccordionContent className="space-y-3">
+                          <ScriptCard variant="primary">
+                            <p>
+                              &ldquo;Help me understand how you typically use your phone. Do you stream a lot of videos?
+                              Work from home? Travel frequently? This helps me find the right data amount for
+                              you.&rdquo;
+                            </p>
+                          </ScriptCard>
+                          <div className="grid sm:grid-cols-2 gap-2 text-sm">
+                            <div className="p-2 bg-muted rounded">
+                              <p className="font-medium">Light User (5-15GB)</p>
+                              <p className="text-xs text-muted-foreground">Email, social media, light browsing</p>
+                            </div>
+                            <div className="p-2 bg-muted rounded">
+                              <p className="font-medium">Moderate (20-50GB)</p>
+                              <p className="text-xs text-muted-foreground">Streaming music, video calls, GPS</p>
+                            </div>
+                            <div className="p-2 bg-muted rounded">
+                              <p className="font-medium">Heavy (60-100GB)</p>
+                              <p className="text-xs text-muted-foreground">HD streaming, mobile hotspot, gaming</p>
+                            </div>
+                            <div className="p-2 bg-muted rounded">
+                              <p className="font-medium">Unlimited</p>
+                              <p className="text-xs text-muted-foreground">Work from anywhere, no WiFi access</p>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+
+                      <AccordionItem value="device">
+                        <AccordionTrigger>4. Device situation?</AccordionTrigger>
+                        <AccordionContent className="space-y-3">
+                          <ScriptCard variant="primary">
+                            <p>
+                              &ldquo;Do you already have a phone you&apos;d like to bring with you, or are you
+                              interested in getting a new device as well? What kind of phone do you currently
+                              use?&rdquo;
+                            </p>
+                          </ScriptCard>
+                          <div className="grid sm:grid-cols-2 gap-3 text-sm">
+                            <div className="p-3 border rounded-lg">
+                              <p className="font-medium flex items-center gap-2">
+                                <Smartphone className="h-4 w-4" />
+                                Bringing Own Device (BYOD)
+                              </p>
+                              <ul className="text-xs text-muted-foreground mt-2 space-y-1">
+                                <li>• Check device compatibility</li>
+                                <li>• Verify it&apos;s unlocked</li>
+                                <li>• Lower monthly cost (no financing)</li>
+                                <li>• BYOD exclusive plans available</li>
+                              </ul>
+                            </div>
+                            <div className="p-3 border rounded-lg">
+                              <p className="font-medium flex items-center gap-2">
+                                <Phone className="h-4 w-4" />
+                                Wants New Device
+                              </p>
+                              <ul className="text-xs text-muted-foreground mt-2 space-y-1">
+                                <li>• Device financing options</li>
+                                <li>• {brand === "fido" ? "Fido Payment Program" : "Upfront Edge"}</li>
+                                <li>• Trade-in programs available</li>
+                                <li>• Latest models in stock</li>
+                              </ul>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+
+                      <AccordionItem value="competitor">
+                        <AccordionTrigger>5. Current provider?</AccordionTrigger>
+                        <AccordionContent className="space-y-3">
+                          <ScriptCard variant="primary">
+                            <p>
+                              &ldquo;Who is your current provider, if you have one? And what made you start looking at{" "}
+                              {brandName}? Understanding this helps me ensure we address any concerns.&rdquo;
+                            </p>
+                          </ScriptCard>
+                          <div className="p-3 bg-muted rounded-lg text-sm">
+                            <p className="font-medium mb-2">Common reasons for switching:</p>
+                            <ul className="text-muted-foreground space-y-1">
+                              <li>
+                                • <strong>Better price:</strong> Highlight our value and promotions
+                              </li>
+                              <li>
+                                • <strong>Better coverage:</strong> Explain Rogers 5G network advantage
+                              </li>
+                              <li>
+                                • <strong>Poor service:</strong> Emphasize our customer care commitment
+                              </li>
+                              <li>
+                                • <strong>Device upgrade:</strong> Show financing options and deals
+                              </li>
+                              <li>
+                                • <strong>Contract ending:</strong> Perfect timing for new offers
+                              </li>
+                            </ul>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="scenarios" className="space-y-3">
+                <div className="grid gap-4">
+                  {/* Family BYOD Scenario */}
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Users className="h-4 w-4 text-blue-600" />
+                        Family BYOD Scenario
+                      </CardTitle>
+                      <CardDescription>Like &quot;Mark&quot; - Family of 3+ with existing devices</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="grid sm:grid-cols-3 gap-3 text-sm">
+                        <div className="p-3 bg-blue-50 rounded-lg">
+                          <p className="font-medium text-blue-800">Why are they calling?</p>
+                          <ul className="text-blue-700 text-xs mt-1 space-y-1">
+                            <li>• Inquiring about wireless plans</li>
+                            <li>• Saw offers on website</li>
+                            <li>• Shopping around for best deal</li>
+                          </ul>
+                        </div>
+                        <div className="p-3 bg-blue-50 rounded-lg">
+                          <p className="font-medium text-blue-800">Who are they?</p>
+                          <ul className="text-blue-700 text-xs mt-1 space-y-1">
+                            <li>• Family with multiple members</li>
+                            <li>• Mix of adults and possibly teens</li>
+                            <li>• Already have compatible devices</li>
+                          </ul>
+                        </div>
+                        <div className="p-3 bg-blue-50 rounded-lg">
+                          <p className="font-medium text-blue-800">How to help?</p>
+                          <ul className="text-blue-700 text-xs mt-1 space-y-1">
+                            <li>• Ask what package interests them</li>
+                            <li>• Probe for individual needs</li>
+                            <li>• Pitch best family package</li>
+                            <li>• Explain self-serve options</li>
+                          </ul>
+                        </div>
+                      </div>
+
+                      <ScriptCard variant="success">
+                        <p className="font-medium mb-2">Recommended Pitch for Family BYOD:</p>
+                        <p>
+                          &ldquo;Based on what you&apos;ve told me about your family&apos;s needs, I&apos;d recommend
+                          our {brand === "fido" ? "50GB" : "60GB"}
+                          BYOD plan at ${brand === "fido" ? "40" : "45"}/line with Auto Pay. For {customerName}&apos;s
+                          family of [X], that comes to $[total]/month total. Each person gets their own data, and since
+                          you&apos;re bringing your own devices, there&apos;s no device financing to worry about. Plus,
+                          you&apos;ll be on Canada&apos;s most reliable 5G network. Would you like me to get this set up
+                          for you today?&rdquo;
+                        </p>
+                      </ScriptCard>
+                    </CardContent>
+                  </Card>
+
+                  {/* Single User New Device */}
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Smartphone className="h-4 w-4 text-purple-600" />
+                        Single User - Wants New Device
+                      </CardTitle>
+                      <CardDescription>Customer looking for phone + plan bundle</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <ScriptCard variant="primary">
+                        <p>
+                          &ldquo;Great choice looking at a new device! Our{" "}
+                          {brand === "fido" ? "Fido Payment Program" : "Upfront Edge"} lets you spread out the cost of
+                          your phone over 24 months with 0% interest. What kind of phone were you thinking about - are
+                          you an iPhone person or Android?&rdquo;
+                        </p>
+                      </ScriptCard>
+                      <div className="p-3 bg-muted rounded-lg text-sm">
+                        <p className="font-medium mb-2">Key selling points:</p>
+                        <ul className="text-muted-foreground space-y-1">
+                          <li>• Latest iPhone and Samsung Galaxy models available</li>
+                          <li>• 0% financing on device payments</li>
+                          <li>• Trade-in credit for old device</li>
+                          <li>• Free eSIM activation</li>
+                          <li>• Device protection options available</li>
+                        </ul>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Student/Young Adult */}
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Gift className="h-4 w-4 text-orange-600" />
+                        Student / Young Adult
+                      </CardTitle>
+                      <CardDescription>Budget-conscious, high data needs</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <ScriptCard variant="primary">
+                        <p>
+                          &ldquo;I have some great options that are perfect for students!{" "}
+                          {brand === "fido" ? "Fido" : "Rogers"} has plans starting at just $
+                          {brand === "fido" ? "29" : "34"}/month. Are you currently a student? We sometimes have special
+                          back-to-school offers as well.&rdquo;
+                        </p>
+                      </ScriptCard>
+                      <div className="text-sm text-muted-foreground">
+                        <p className="font-medium text-foreground mb-1">Remember to mention:</p>
+                        <ul className="space-y-1">
+                          <li>• Data overage protection (no surprise charges)</li>
+                          <li>• {brand === "fido" ? "Fido XTRA" : "Rogers Mastercard"} rewards</li>
+                          <li>• Easy online account management via app</li>
+                        </ul>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="byod" className="space-y-3">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm">BYOD (Bring Your Own Device) Process</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="p-4 bg-muted rounded-lg">
+                      <p className="text-sm font-medium mb-3">Step-by-Step BYOD Setup:</p>
+                      <ol className="text-sm text-muted-foreground space-y-2 list-decimal list-inside">
+                        <li>
+                          <strong>Verify device compatibility:</strong> Check if their phone works on Rogers/Fido
+                          network
+                          <ul className="ml-6 mt-1 list-disc text-xs">
+                            <li>Must support Canadian LTE/5G bands</li>
+                            <li>Check IMEI if needed on {brand === "fido" ? "fido.ca" : "rogers.com"}/byod</li>
+                          </ul>
+                        </li>
+                        <li>
+                          <strong>Confirm device is unlocked:</strong> If from another carrier, must be unlocked
+                          <ul className="ml-6 mt-1 list-disc text-xs">
+                            <li>Can test with a friend&apos;s SIM card</li>
+                            <li>Contact previous carrier to unlock if needed</li>
+                          </ul>
+                        </li>
+                        <li>
+                          <strong>Choose the right plan:</strong> BYOD plans are cheaper (no device cost)
+                        </li>
+                        <li>
+                          <strong>SIM or eSIM:</strong> Ask customer preference
+                          <ul className="ml-6 mt-1 list-disc text-xs">
+                            <li>eSIM: Instant activation, no physical card</li>
+                            <li>Physical SIM: Ships free or pickup in store</li>
+                          </ul>
+                        </li>
+                        <li>
+                          <strong>Port number (if applicable):</strong> Need account # and PIN from old carrier
+                        </li>
+                        <li>
+                          <strong>Set up Auto Pay:</strong> Save $5/month on most plans
+                        </li>
+                      </ol>
+                    </div>
+
+                    <ScriptCard variant="primary">
+                      <p className="font-medium mb-2">BYOD Compatibility Check Script:</p>
+                      <p>
+                        &ldquo;Let me make sure your phone will work perfectly on our network. What&apos;s the make and
+                        model of your device? And do you know if it&apos;s unlocked from your previous carrier?&rdquo;
+                      </p>
+                    </ScriptCard>
+
+                    <Alert>
+                      <ShieldCheck className="h-4 w-4" />
+                      <AlertTitle>BYOD Advantages to Highlight</AlertTitle>
+                      <AlertDescription>
+                        <ul className="text-sm mt-2 space-y-1">
+                          <li>
+                            • <strong>Lower monthly cost</strong> - No device financing on your bill
+                          </li>
+                          <li>
+                            • <strong>No commitment</strong> - Month-to-month flexibility
+                          </li>
+                          <li>
+                            • <strong>Keep your phone</strong> - All your data, apps, and settings stay
+                          </li>
+                          <li>
+                            • <strong>Same great network</strong> - Full access to 5G and all features
+                          </li>
+                        </ul>
+                      </AlertDescription>
+                    </Alert>
+
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      <div className="p-3 border rounded-lg">
+                        <p className="font-medium text-sm flex items-center gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-green-600" />
+                          Compatible Devices
+                        </p>
+                        <ul className="text-xs text-muted-foreground mt-2 space-y-1">
+                          <li>• iPhone 8 and newer</li>
+                          <li>• Samsung Galaxy S9 and newer</li>
+                          <li>• Google Pixel 3 and newer</li>
+                          <li>• Most unlocked Android phones</li>
+                        </ul>
+                      </div>
+                      <div className="p-3 border rounded-lg">
+                        <p className="font-medium text-sm flex items-center gap-2">
+                          <AlertCircle className="h-4 w-4 text-amber-600" />
+                          May Have Issues
+                        </p>
+                        <ul className="text-xs text-muted-foreground mt-2 space-y-1">
+                          <li>• Carrier-locked phones</li>
+                          <li>• Very old models (pre-4G LTE)</li>
+                          <li>• Some international variants</li>
+                          <li>• CDMA-only devices</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="selfserve" className="space-y-3">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm">Self-Serve Registration Guide</CardTitle>
+                    <CardDescription>Help customers set up online account management</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <ScriptCard variant="success">
+                      <p className="font-medium mb-2">After activation, explain self-serve:</p>
+                      <p>
+                        &ldquo;Now that your account is set up, let me quickly tell you about our self-serve options.
+                        You can manage almost everything through our {brand === "fido" ? "My Fido" : "MyRogers"} app or
+                        at {brand === "fido" ? "fido.ca/myaccount" : "rogers.com/myrogers"}. Would you like me to walk
+                        you through the registration?&rdquo;
+                      </p>
+                    </ScriptCard>
+
+                    <div className="p-4 bg-muted rounded-lg">
+                      <p className="text-sm font-medium mb-3">
+                        {brand === "fido" ? "My Fido" : "MyRogers"} App & Website Registration:
+                      </p>
+                      <ol className="text-sm text-muted-foreground space-y-2 list-decimal list-inside">
+                        <li>
+                          Download <strong>{brand === "fido" ? "My Fido" : "MyRogers"}</strong> app from App Store /
+                          Google Play
+                        </li>
+                        <li>Click &quot;Register&quot; or &quot;Create Account&quot;</li>
+                        <li>Enter the phone number we just activated</li>
+                        <li>Verify with the code sent via SMS</li>
+                        <li>Create a password</li>
+                        <li>Set up security questions for account recovery</li>
+                      </ol>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      <div className="p-3 border rounded-lg">
+                        <p className="font-medium text-sm">What they can do online:</p>
+                        <ul className="text-xs text-muted-foreground mt-2 space-y-1">
+                          <li>• View and pay bills</li>
+                          <li>• Check real-time data usage</li>
+                          <li>• Change plans</li>
+                          <li>• Add/remove features</li>
+                          <li>• Update contact info</li>
+                          <li>• Set up Auto Pay</li>
+                          <li>• Add travel passes</li>
+                          <li>• Chat with support</li>
+                        </ul>
+                      </div>
+                      <div className="p-3 border rounded-lg">
+                        <p className="font-medium text-sm">Helpful to know:</p>
+                        <ul className="text-xs text-muted-foreground mt-2 space-y-1">
+                          <li>• First bill in ~30 days</li>
+                          <li>• E-bill is default (eco-friendly!)</li>
+                          <li>• Push notifications for usage alerts</li>
+                          <li>• 24/7 access to account</li>
+                          <li>• {brand === "fido" ? "Fido XTRA" : "Rogers rewards"} program opt-in</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    {agentType === "cable" && (
+                      <Alert className="border-blue-200 bg-blue-50">
+                        <Home className="h-4 w-4 text-blue-600" />
+                        <AlertTitle className="text-blue-800">Bundle Opportunity</AlertTitle>
+                        <AlertDescription className="text-blue-700">
+                          New wireless customers are great candidates for home internet bundles. Ask if they&apos;re
+                          happy with their current internet provider!
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+
+            <Card className="border-green-200 bg-green-50">
+              <CardContent className="pt-4">
+                <p className="text-sm font-medium text-green-800 mb-3">Final New Customer Checklist:</p>
+                <div className="grid sm:grid-cols-2 gap-2 text-sm text-green-700">
+                  <label className="flex items-center gap-2">
+                    <input type="checkbox" className="rounded" />
+                    <span>Verified customer needs</span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input type="checkbox" className="rounded" />
+                    <span>Recommended best plan</span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input type="checkbox" className="rounded" />
+                    <span>Device situation confirmed</span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input type="checkbox" className="rounded" />
+                    <span>Auto Pay explained ($5 savings)</span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input type="checkbox" className="rounded" />
+                    <span>Self-serve registration offered</span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input type="checkbox" className="rounded" />
+                    <span>First bill date communicated</span>
+                  </label>
+                </div>
+              </CardContent>
+            </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {selectedCategory === "billing" && (
         <Card>
