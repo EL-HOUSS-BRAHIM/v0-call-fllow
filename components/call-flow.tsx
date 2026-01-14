@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-
+import { Heart } from "lucide-react"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -27,6 +27,8 @@ import { AuthenticationStep } from "@/components/steps/authentication-step"
 import { ProblemResolutionStep } from "@/components/steps/problem-resolution-step"
 import { PlansOffersStep } from "@/components/steps/plans-offers-step"
 import { ClosingStep } from "@/components/steps/closing-step"
+import { SurveyStep } from "@/components/steps/survey-step"
+import { InsulateStep } from "@/components/steps/insulate-step"
 
 interface CallFlowProps {
   agentInfo: AgentInfo
@@ -34,13 +36,15 @@ interface CallFlowProps {
   onAdminClick?: () => void
 }
 
-export type CallStep = "welcome" | "authentication" | "resolution" | "offers" | "closing"
+export type CallStep = "welcome" | "authentication" | "resolution" | "insulate" | "offers" | "survey" | "closing"
 
 const STEPS: { id: CallStep; label: string; icon: React.ReactNode }[] = [
   { id: "welcome", label: "Welcome", icon: <MessageSquare className="h-4 w-4" /> },
   { id: "authentication", label: "Authentication", icon: <Shield className="h-4 w-4" /> },
   { id: "resolution", label: "Resolution", icon: <Wrench className="h-4 w-4" /> },
+  { id: "insulate", label: "Insulate", icon: <Heart className="h-4 w-4" /> },
   { id: "offers", label: "Plans & Offers", icon: <Smartphone className="h-4 w-4" /> },
+  { id: "survey", label: "Survey", icon: <MessageSquare className="h-4 w-4" /> },
   { id: "closing", label: "Closing", icon: <CheckCircle2 className="h-4 w-4" /> },
 ]
 
@@ -289,11 +293,28 @@ export function CallFlow({ agentInfo, onLogout, onAdminClick }: CallFlowProps) {
                 onNext={nextStep}
               />
             )}
+            {currentStep === "insulate" && (
+              <InsulateStep
+                agentName={agentInfo.name}
+                brand={selectedBrand}
+                customerName={customerName}
+                agentType={agentInfo.type}
+                onNext={nextStep}
+              />
+            )}
             {currentStep === "offers" && (
               <PlansOffersStep
                 brand={selectedBrand}
                 customerName={customerName}
                 agentType={agentInfo.type}
+                onNext={nextStep}
+              />
+            )}
+            {currentStep === "survey" && (
+              <SurveyStep
+                agentName={agentInfo.name}
+                brand={selectedBrand}
+                customerName={customerName}
                 onNext={nextStep}
               />
             )}
