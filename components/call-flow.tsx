@@ -19,6 +19,7 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronUp,
+  Settings,
 } from "lucide-react"
 import type { AgentInfo } from "@/app/page"
 import { WelcomeStep } from "@/components/steps/welcome-step"
@@ -30,6 +31,7 @@ import { ClosingStep } from "@/components/steps/closing-step"
 interface CallFlowProps {
   agentInfo: AgentInfo
   onLogout: () => void
+  onAdminClick?: () => void
 }
 
 export type CallStep = "welcome" | "authentication" | "resolution" | "offers" | "closing"
@@ -42,7 +44,7 @@ const STEPS: { id: CallStep; label: string; icon: React.ReactNode }[] = [
   { id: "closing", label: "Closing", icon: <CheckCircle2 className="h-4 w-4" /> },
 ]
 
-export function CallFlow({ agentInfo, onLogout }: CallFlowProps) {
+export function CallFlow({ agentInfo, onLogout, onAdminClick }: CallFlowProps) {
   const [currentStep, setCurrentStep] = useState<CallStep>("welcome")
   const [customerName, setCustomerName] = useState("")
   const [selectedBrand, setSelectedBrand] = useState<"rogers" | "fido">("rogers")
@@ -93,6 +95,7 @@ export function CallFlow({ agentInfo, onLogout }: CallFlowProps) {
               <h1 className="font-semibold">Call Flow Assistant</h1>
               <p className="text-xs text-muted-foreground">
                 Agent: {agentInfo.name} • {agentInfo.type === "wireless" ? "Wireless" : "Cable"}
+                {agentInfo.isAdmin && <span className="ml-1 text-primary">(Admin)</span>}
               </p>
             </div>
           </div>
@@ -103,6 +106,11 @@ export function CallFlow({ agentInfo, onLogout }: CallFlowProps) {
                 <TabsTrigger value="fido">Fido</TabsTrigger>
               </TabsList>
             </Tabs>
+            {onAdminClick && (
+              <Button variant="outline" size="icon" onClick={onAdminClick} title="Admin Panel">
+                <Settings className="h-4 w-4" />
+              </Button>
+            )}
             <Button variant="ghost" size="icon" onClick={onLogout}>
               <LogOut className="h-4 w-4" />
             </Button>

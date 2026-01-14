@@ -5,47 +5,73 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { Phone, Wifi, AlertCircle } from "lucide-react"
+import { Phone, Wifi, AlertCircle, Loader2 } from "lucide-react"
 import type { AgentInfo, AgentType } from "@/app/page"
+import { createClient } from "@/lib/supabase/client"
 
 interface AgentSetupProps {
   onComplete: (info: AgentInfo) => void
 }
 
-const VALID_PIN = "1234" // Simple PIN for demo - you can change this
-
 export function AgentSetup({ onComplete }: AgentSetupProps) {
-  const [step, setStep] = useState<"pin" | "name" | "type">("pin")
-  const [pin, setPin] = useState("")
-  const [name, setName] = useState("")
-  const [pinError, setPinError] = useState("")
+  const [step, setStep] = useState<"agentId" | "type">("agentId")
+  const [agentId, setAgentId] = useState("")
+  const [agentName, setAgentName] = useState("")
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [error, setError] = useState("")
   const [attempts, setAttempts] = useState(0)
-  const MAX_ATTEMPTS = 3
+  const [isLoading, setIsLoading] = useState(false)
+  const MAX_ATTEMPTS = 5
 
-  const handlePinSubmit = () => {
-    if (pin === VALID_PIN) {
-      setStep("name")
-      setPinError("")
-    } else {
-      const newAttempts = attempts + 1
-      setAttempts(newAttempts)
-      if (newAttempts >= MAX_ATTEMPTS) {
-        setPinError("Too many failed attempts. Please contact your supervisor.")
-      } else {
-        setPinError(`Invalid PIN. ${MAX_ATTEMPTS - newAttempts} attempts remaining.`)
+  const handleAgentIdSubmit = async () => {
+    if (!agentId.trim()) return
+
+    setIsLoading(true)
+    setError("")
+
+    try {
+      const supabase = createClient()
+
+      // Check if agent ID exists in database
+      const { data: agent, error: dbError } = await supabase
+        .from("agents")
+        .select("*")
+        .eq("agent_id", agentId.trim())
+        .single()
+
+      if (dbError || !agent) {
+        const newAttempts = attempts + 1
+        setAttempts(newAttempts)
+        if (newAttempts >= MAX_ATTEMPTS) {
+          setError("Too many failed attempts. Please contact your supervisor.")
+        } else {
+          setError(`Agent ID not found. ${MAX_ATTEMPTS - newAttempts} attempts remaining.`)
+        }
+        setAgentId("")
+        setIsLoading(false)
+        return
       }
-      setPin("")
-    }
-  }
 
-  const handleNameSubmit = () => {
-    if (name.trim()) {
+      // Update last login
+      await supabase.from("agents").update({ last_login: new Date().toISOString() }).eq("agent_id", agentId.trim())
+
+      setAgentName(agent.name)
+      setIsAdmin(agent.is_admin)
       setStep("type")
+    } catch (err) {
+      setError("Connection error. Please try again.")
+    } finally {
+      setIsLoading(false)
     }
   }
 
   const handleTypeSelect = (type: AgentType) => {
-    onComplete({ name: name.trim(), type })
+    onComplete({
+      name: agentName,
+      type,
+      agentId: agentId.trim(),
+      isAdmin,
+    })
   }
 
   return (
@@ -57,61 +83,56 @@ export function AgentSetup({ onComplete }: AgentSetupProps) {
           </div>
           <CardTitle className="text-2xl">Call Flow Assistant</CardTitle>
           <CardDescription>
-            {step === "pin" && "Enter your agent PIN to continue"}
-            {step === "name" && "What's your name?"}
+            {step === "agentId" && "Enter your Agent ID to continue"}
             {step === "type" && "Select your department"}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {step === "pin" && (
+          {step === "agentId" && (
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="pin">Agent PIN</Label>
+                <Label htmlFor="agentId">Agent ID</Label>
                 <Input
-                  id="pin"
-                  type="password"
-                  placeholder="Enter PIN"
-                  value={pin}
-                  onChange={(e) => setPin(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handlePinSubmit()}
-                  maxLength={6}
-                  disabled={attempts >= MAX_ATTEMPTS}
+                  id="agentId"
+                  type="text"
+                  placeholder="Enter your Agent ID"
+                  value={agentId}
+                  onChange={(e) => setAgentId(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleAgentIdSubmit()}
+                  disabled={attempts >= MAX_ATTEMPTS || isLoading}
                 />
-                {pinError && (
+                {error && (
                   <div className="flex items-center gap-2 text-sm text-destructive">
                     <AlertCircle className="h-4 w-4" />
-                    {pinError}
+                    {error}
                   </div>
                 )}
               </div>
-              <Button className="w-full" onClick={handlePinSubmit} disabled={!pin || attempts >= MAX_ATTEMPTS}>
-                Continue
+              <Button
+                className="w-full"
+                onClick={handleAgentIdSubmit}
+                disabled={!agentId.trim() || attempts >= MAX_ATTEMPTS || isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Verifying...
+                  </>
+                ) : (
+                  "Continue"
+                )}
               </Button>
-            </div>
-          )}
-
-          {step === "name" && (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Your Name</Label>
-                <Input
-                  id="name"
-                  placeholder="Enter your name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleNameSubmit()}
-                />
-              </div>
-              <Button className="w-full" onClick={handleNameSubmit} disabled={!name.trim()}>
-                Continue
-              </Button>
+              <p className="text-xs text-center text-muted-foreground">
+                Contact your supervisor if you don't have an Agent ID
+              </p>
             </div>
           )}
 
           {step === "type" && (
             <div className="space-y-4">
               <p className="text-center text-muted-foreground mb-4">
-                Welcome, <span className="font-medium text-foreground">{name}</span>!
+                Welcome back, <span className="font-medium text-foreground">{agentName}</span>!
+                {isAdmin && <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">Admin</span>}
               </p>
               <div className="grid gap-3">
                 <Button
