@@ -1,6 +1,4 @@
 "use client"
-
-import type React from "react"
 import { Heart } from "lucide-react"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
@@ -22,13 +20,15 @@ import {
   Settings,
 } from "lucide-react"
 import type { AgentInfo } from "@/app/page"
-import { WelcomeStep } from "@/components/steps/welcome-step"
 import { AuthenticationStep } from "@/components/steps/authentication-step"
-import { ProblemResolutionStep } from "@/components/steps/problem-resolution-step"
 import { PlansOffersStep } from "@/components/steps/plans-offers-step"
 import { ClosingStep } from "@/components/steps/closing-step"
 import { SurveyStep } from "@/components/steps/survey-step"
 import { InsulateStep } from "@/components/steps/insulate-step"
+import { WirelessWelcomeStep } from "@/components/steps/wireless-welcome-step"
+import { CableWelcomeStep } from "@/components/steps/cable-welcome-step"
+import { WirelessResolutionStep } from "@/components/steps/wireless-resolution-step"
+import { CableResolutionStep } from "@/components/steps/cable-resolution-step"
 
 interface CallFlowProps {
   agentInfo: AgentInfo
@@ -38,16 +38,6 @@ interface CallFlowProps {
 
 export type CallStep = "welcome" | "authentication" | "resolution" | "insulate" | "offers" | "survey" | "closing"
 
-const STEPS: { id: CallStep; label: string; icon: React.ReactNode }[] = [
-  { id: "welcome", label: "Welcome", icon: <MessageSquare className="h-4 w-4" /> },
-  { id: "authentication", label: "Authentication", icon: <Shield className="h-4 w-4" /> },
-  { id: "resolution", label: "Resolution", icon: <Wrench className="h-4 w-4" /> },
-  { id: "insulate", label: "Insulate", icon: <Heart className="h-4 w-4" /> },
-  { id: "offers", label: "Plans & Offers", icon: <Smartphone className="h-4 w-4" /> },
-  { id: "survey", label: "Survey", icon: <MessageSquare className="h-4 w-4" /> },
-  { id: "closing", label: "Closing", icon: <CheckCircle2 className="h-4 w-4" /> },
-]
-
 export function CallFlow({ agentInfo, onLogout, onAdminClick }: CallFlowProps) {
   const [currentStep, setCurrentStep] = useState<CallStep>("welcome")
   const [customerName, setCustomerName] = useState("")
@@ -55,6 +45,31 @@ export function CallFlow({ agentInfo, onLogout, onAdminClick }: CallFlowProps) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
 
+  const getStepsForAgentType = () => {
+    if (agentInfo.type === "wireless") {
+      return [
+        { id: "welcome", label: "Welcome", icon: <MessageSquare className="h-4 w-4" /> },
+        { id: "authentication", label: "Authentication", icon: <Shield className="h-4 w-4" /> },
+        { id: "resolution", label: "Resolution", icon: <Wrench className="h-4 w-4" /> },
+        { id: "insulate", label: "Insulate & Retention", icon: <Heart className="h-4 w-4" /> },
+        { id: "offers", label: "Device & Plans", icon: <Smartphone className="h-4 w-4" /> },
+        { id: "survey", label: "Survey", icon: <MessageSquare className="h-4 w-4" /> },
+        { id: "closing", label: "Closing", icon: <CheckCircle2 className="h-4 w-4" /> },
+      ]
+    } else {
+      return [
+        { id: "welcome", label: "Welcome", icon: <MessageSquare className="h-4 w-4" /> },
+        { id: "authentication", label: "Authentication", icon: <Shield className="h-4 w-4" /> },
+        { id: "resolution", label: "Resolution", icon: <Wrench className="h-4 w-4" /> },
+        { id: "insulate", label: "Business Value", icon: <Heart className="h-4 w-4" /> },
+        { id: "offers", label: "Bundles & Add-ons", icon: <Smartphone className="h-4 w-4" /> },
+        { id: "survey", label: "Survey", icon: <MessageSquare className="h-4 w-4" /> },
+        { id: "closing", label: "Closing", icon: <CheckCircle2 className="h-4 w-4" /> },
+      ]
+    }
+  }
+
+  const STEPS = getStepsForAgentType()
   const currentStepIndex = STEPS.findIndex((s) => s.id === currentStep)
 
   useEffect(() => {
@@ -86,6 +101,48 @@ export function CallFlow({ agentInfo, onLogout, onAdminClick }: CallFlowProps) {
     }
   }
 
+  const renderStepContent = () => {
+    if (agentInfo.type === "wireless") {
+      switch (currentStep) {
+        case "welcome":
+          return <WirelessWelcomeStep onNext={nextStep} brand={selectedBrand} />
+        case "authentication":
+          return <AuthenticationStep onNext={nextStep} agentType="wireless" brand={selectedBrand} />
+        case "resolution":
+          return <WirelessResolutionStep onNext={nextStep} />
+        case "insulate":
+          return <InsulateStep onNext={nextStep} agentType="wireless" />
+        case "offers":
+          return <PlansOffersStep onNext={nextStep} agentType="wireless" brand={selectedBrand} />
+        case "survey":
+          return <SurveyStep onNext={nextStep} />
+        case "closing":
+          return <ClosingStep agentType="wireless" />
+        default:
+          return null
+      }
+    } else {
+      switch (currentStep) {
+        case "welcome":
+          return <CableWelcomeStep onNext={nextStep} brand={selectedBrand} />
+        case "authentication":
+          return <AuthenticationStep onNext={nextStep} agentType="cable" brand={selectedBrand} />
+        case "resolution":
+          return <CableResolutionStep onNext={nextStep} />
+        case "insulate":
+          return <InsulateStep onNext={nextStep} agentType="cable" />
+        case "offers":
+          return <PlansOffersStep onNext={nextStep} agentType="cable" brand={selectedBrand} />
+        case "survey":
+          return <SurveyStep onNext={nextStep} />
+        case "closing":
+          return <ClosingStep agentType="cable" />
+        default:
+          return null
+      }
+    }
+  }
+
   return (
     <div className="min-h-screen bg-muted/30">
       {/* Header */}
@@ -98,7 +155,7 @@ export function CallFlow({ agentInfo, onLogout, onAdminClick }: CallFlowProps) {
             <div>
               <h1 className="font-semibold">Call Flow Assistant</h1>
               <p className="text-xs text-muted-foreground">
-                Agent: {agentInfo.name} • {agentInfo.type === "wireless" ? "Wireless" : "Cable"}
+                Agent: {agentInfo.name} • {agentInfo.type === "wireless" ? "📱 Wireless" : "🌐 Cable/Internet"}
                 {agentInfo.isAdmin && <span className="ml-1 text-primary">(Admin)</span>}
               </p>
             </div>
@@ -198,9 +255,11 @@ export function CallFlow({ agentInfo, onLogout, onAdminClick }: CallFlowProps) {
       </div>
 
       <div className="container mx-auto px-4 py-6">
-        <div className="grid lg:grid-cols-[280px_1fr] gap-6">
+        <div className="grid lg:grid-cols-4 gap-4">
           {/* Sidebar - Step Navigation (Desktop only) */}
-          <Card className="h-fit sticky top-24 hidden lg:block">
+          <Card
+            className={`h-fit sticky top-24 lg:col-span-1 ${isSidebarCollapsed ? "hidden" : "block"} transition-all duration-300`}
+          >
             <CardHeader className="pb-3">
               <CardTitle className="text-base">Call Progress</CardTitle>
               {customerName && (
@@ -243,7 +302,7 @@ export function CallFlow({ agentInfo, onLogout, onAdminClick }: CallFlowProps) {
           </Card>
 
           {/* Main Content */}
-          <div className="space-y-4">
+          <div className="lg:col-span-3 space-y-4">
             {/* Navigation buttons */}
             <div className="flex items-center justify-between">
               <Button variant="outline" onClick={prevStep} disabled={currentStepIndex === 0}>
@@ -267,60 +326,7 @@ export function CallFlow({ agentInfo, onLogout, onAdminClick }: CallFlowProps) {
             </div>
 
             {/* Step Content */}
-            {currentStep === "welcome" && (
-              <WelcomeStep
-                agentName={agentInfo.name}
-                brand={selectedBrand}
-                customerName={customerName}
-                onCustomerNameChange={setCustomerName}
-                onNext={nextStep}
-              />
-            )}
-            {currentStep === "authentication" && (
-              <AuthenticationStep
-                agentName={agentInfo.name}
-                brand={selectedBrand}
-                customerName={customerName}
-                onNext={nextStep}
-              />
-            )}
-            {currentStep === "resolution" && (
-              <ProblemResolutionStep
-                agentName={agentInfo.name}
-                brand={selectedBrand}
-                customerName={customerName}
-                agentType={agentInfo.type}
-                onNext={nextStep}
-              />
-            )}
-            {currentStep === "insulate" && (
-              <InsulateStep
-                agentName={agentInfo.name}
-                brand={selectedBrand}
-                customerName={customerName}
-                agentType={agentInfo.type}
-                onNext={nextStep}
-              />
-            )}
-            {currentStep === "offers" && (
-              <PlansOffersStep
-                brand={selectedBrand}
-                customerName={customerName}
-                agentType={agentInfo.type}
-                onNext={nextStep}
-              />
-            )}
-            {currentStep === "survey" && (
-              <SurveyStep
-                agentName={agentInfo.name}
-                brand={selectedBrand}
-                customerName={customerName}
-                onNext={nextStep}
-              />
-            )}
-            {currentStep === "closing" && (
-              <ClosingStep agentName={agentInfo.name} brand={selectedBrand} customerName={customerName} />
-            )}
+            {renderStepContent()}
           </div>
         </div>
       </div>
