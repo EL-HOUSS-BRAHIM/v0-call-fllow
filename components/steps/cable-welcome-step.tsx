@@ -2,37 +2,53 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Wifi, Cable, DollarSign } from "lucide-react"
+import { Wifi, DollarSign, Shield, PhoneOff } from "lucide-react"
 
 interface CableWelcomeStepProps {
   onNext: () => void
   brand: "rogers" | "fido"
+  accountType: "consumer" | "business"
 }
 
-export function CableWelcomeStep({ onNext, brand }: CableWelcomeStepProps) {
+export function CableWelcomeStep({ onNext, brand, accountType }: CableWelcomeStepProps) {
   const greetings = {
-    rogers:
-      "Hello and thank you for calling Rogers. This is [Your Name] from Rogers Customer Care. May I have your account number or phone number associated with your account?",
-    fido: "Hi there! Thanks for calling Fido. I'm [Your Name]. Can I get your account details or phone number?",
+    rogers_consumer:
+      "Hello and thank you for calling Rogers. This is [Your Name] from Rogers Customer Care. Can I please have your account number or phone number associated with your account?",
+    rogers_business:
+      "Hi, you have reached Rogers Business Team. Can I please have your first and last name, then your account number? Thank you so much for calling today—let's get started.",
+    fido_consumer:
+      "Hi there! Thanks for calling Fido. I'm [Your Name]. Can I get your account details or phone number?",
   }
 
-  const keyFocusItems = [
+  const businessFocusItems = [
     {
-      icon: <Wifi className="h-5 w-5" />,
-      title: "Internet Performance",
-      description: "Assess speed, connectivity issues, and upload/download needs",
+      icon: <Shield className="h-5 w-5" />,
+      title: "Voice ID & Security Verification",
+      description:
+        "Verify customer identity via Voice ID. If 'Consent Not Received', perform manual authentication + MFA combo.",
     },
     {
-      icon: <Cable className="h-5 w-5" />,
-      title: "Bundle Opportunities",
-      description: "Review bundled services and cross-sell potential (Internet + Phone + TV)",
+      icon: <Wifi className="h-5 w-5" />,
+      title: "Internet Uptime & Reliability",
+      description: "Assess speed performance, recent outages, and business continuity needs. LTE Backup potential.",
+    },
+    {
+      icon: <PhoneOff className="h-5 w-5" />,
+      title: "Bundle Health Check",
+      description: "Review Internet + Phone + TV services. Identify upgrade opportunities and cost optimization.",
     },
     {
       icon: <DollarSign className="h-5 w-5" />,
-      title: "Cost Optimization",
-      description: "Identify bill reductions, promo codes, and LTE backup value",
+      title: "Financial Opportunity",
+      description:
+        "Look for ARPU improvement: Multi-line discounts, Managed WiFi upgrades, LTE Backup for business continuity.",
     },
   ]
+
+  const keyMessage =
+    accountType === "business"
+      ? "Take OWNERSHIP: 'You've reached the right person. I am confident I can assist you with your internet and communications services.'"
+      : "Build rapport while establishing you are the right contact for their service issues."
 
   return (
     <div className="space-y-6">
@@ -40,21 +56,24 @@ export function CableWelcomeStep({ onNext, brand }: CableWelcomeStepProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Wifi className="h-5 w-5 text-primary" />
-            Cable/Internet Welcome
+            Cable/Internet Welcome & Engagement
           </CardTitle>
-          <CardDescription>
-            Establish customer connection with focus on service quality and business continuity
-          </CardDescription>
+          <CardDescription>Professional greeting and initial discovery for internet/phone services</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="bg-muted p-4 rounded-lg">
+          <div className="bg-muted p-4 rounded-lg border border-primary/20">
             <p className="text-sm font-medium mb-2">Opening Script:</p>
-            <p className="text-sm italic">{greetings[brand]}</p>
+            <p className="text-sm italic font-mono">{greetings[`${brand}_${accountType}` as keyof typeof greetings]}</p>
+          </div>
+
+          <div className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded border border-blue-200 dark:border-blue-800">
+            <Badge className="mb-2">Ownership Statement</Badge>
+            <p className="text-sm text-foreground font-medium">{keyMessage}</p>
           </div>
 
           <div className="space-y-3">
-            <p className="text-sm font-medium">Key Cable/Business Focus Areas:</p>
-            {keyFocusItems.map((item, idx) => (
+            <p className="text-sm font-medium">Critical Focus Areas:</p>
+            {businessFocusItems.map((item, idx) => (
               <div key={idx} className="flex gap-3 p-3 bg-background rounded border">
                 <div className="text-primary flex-shrink-0 mt-0.5">{item.icon}</div>
                 <div className="flex-1">
@@ -68,8 +87,8 @@ export function CableWelcomeStep({ onNext, brand }: CableWelcomeStepProps) {
           <div className="bg-amber-50 dark:bg-amber-950/20 p-3 rounded border border-amber-200 dark:border-amber-800">
             <Badge className="mb-2">Business Continuity Focus</Badge>
             <p className="text-xs text-foreground">
-              For business accounts, emphasize reliability, uptime, and LTE backup solutions to prevent revenue loss
-              from outages.
+              For business accounts: Frame LTE Backup as "a backup generator for your internet"—emphasizing uptime
+              protection and prevention of revenue loss during outages. Critical for customer retention.
             </p>
           </div>
         </CardContent>
