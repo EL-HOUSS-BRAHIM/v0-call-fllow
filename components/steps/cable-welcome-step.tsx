@@ -2,22 +2,39 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Wifi, DollarSign, Shield, PhoneOff } from "lucide-react"
 
 interface CableWelcomeStepProps {
   onNext: () => void
   brand: "rogers" | "fido"
   accountType: "consumer" | "business"
+  agentName: string
+  customerName: string
+  onCustomerNameChange: (name: string) => void
 }
 
-export function CableWelcomeStep({ onNext, brand, accountType }: CableWelcomeStepProps) {
+export function CableWelcomeStep({
+  onNext,
+  brand,
+  accountType,
+  agentName,
+  customerName,
+  onCustomerNameChange,
+}: CableWelcomeStepProps) {
   const greetings = {
     rogers_consumer:
-      "Hello and thank you for calling Rogers. This is [Your Name] from Rogers Customer Care. Can I please have your account number or phone number associated with your account?",
+      "Hello and thank you for calling Rogers. This is [agentName] from Rogers Customer Care. Can I please have your account number or phone number associated with your account?",
     rogers_business:
-      "Hi, you have reached Rogers Business Team. Can I please have your first and last name, then your account number? Thank you so much for calling today—let's get started.",
+      "Hi, you have reached Rogers Business Team. This is [agentName]. Can I please have your first and last name, then your account number? Thank you so much for calling today—let's get started.",
     fido_consumer:
-      "Hi there! Thanks for calling Fido. I'm [Your Name]. Can I get your account details or phone number?",
+      "Hi there! Thanks for calling Fido. I'm [agentName]. Can I get your account details or phone number?",
+  }
+
+  const getGreeting = (key: string) => {
+    const greeting = greetings[key as keyof typeof greetings]
+    return greeting ? greeting.replace("[agentName]", agentName) : ""
   }
 
   const businessFocusItems = [
@@ -63,7 +80,17 @@ export function CableWelcomeStep({ onNext, brand, accountType }: CableWelcomeSte
         <CardContent className="space-y-4">
           <div className="bg-muted p-4 rounded-lg border border-primary/20">
             <p className="text-sm font-medium mb-2">Opening Script:</p>
-            <p className="text-sm italic font-mono">{greetings[`${brand}_${accountType}` as keyof typeof greetings]}</p>
+            <p className="text-sm italic font-mono">{getGreeting(`${brand}_${accountType}`)}</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="customerNameCable">Customer Name</Label>
+            <Input
+              id="customerNameCable"
+              placeholder="Enter customer's name"
+              value={customerName}
+              onChange={(e) => onCustomerNameChange(e.target.value)}
+            />
           </div>
 
           <div className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded border border-blue-200 dark:border-blue-800">
@@ -94,7 +121,7 @@ export function CableWelcomeStep({ onNext, brand, accountType }: CableWelcomeSte
         </CardContent>
       </Card>
 
-      <Button onClick={onNext} className="w-full">
+      <Button onClick={onNext} className="w-full" disabled={!customerName}>
         Continue to Authentication
       </Button>
     </div>
